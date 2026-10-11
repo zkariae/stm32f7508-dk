@@ -2,36 +2,59 @@
 # /*!
 # ****************************
 # \file       stm32f7508-dk/board.mk
-# \brief      STM32F7508-DK description for the build: CPU, board files, memories.
+# \brief      STM32F7508-DK build: toolchain, board files, memories and recipes.
 #
 # \author     Z. BEN-AKKA
-# \version    1.0
+# \version    1.1
 # \date       11/10/2026
 #
 # \details
-#   Included by the Makefile of the repository root, which builds the
-#   applications; nothing here depends on them. BOARD_DIR is set by that
-#   Makefile to this folder. Every board provides the same variables:
-#     CROSS, BOARD_ARCH, BOARD_CFLAGS, BOARD_SRCS   toolchain and board files
-#     BOARD_MEMORIES, BOARD_DEFAULT_MEMORY          where an image can live
-#     MEMORY_<m>_LDSCRIPT, _ADDR, _OPENOCD, _DFU     how to link and program it
-#     BOARD_OPENOCD                                 OpenOCD config for reset
+#   Included by the Makefile of the repository root, which declares the
+#   applications and calls the recipes below; nothing here depends on them.
+#   That Makefile sets BOARD_DIR (this folder), PROJECT_CFLAGS (warnings,
+#   optimisation, include paths) and TOOLS (host tools). Every board
+#   provides the same names:
+#     BOARD_SRCS                                  sources linked into every image
+#     BOARD_MEMORIES, BOARD_DEFAULT_MEMORY        where an image can live
+#     MEMORY_<m>_LDSCRIPT, _ADDR, _DFU            how it is linked and reached
+#     board_compile, board_link, board_bin        build recipes, used with $(call)
+#     board_flash, board_dfu, board_reset         programming recipes
+#     board_size, board_disasm, board_sections    inspection recipes
 #
 # \section board_mk_version_history Version history
 # | Version | Date       | Author      | Description                                  |
 # |:-------:|:----------:|:------------|:---------------------------------------------|
 # | 1.0     | 11/10/2026 | Z. BEN-AKKA | Board part of the former board Makefile.     |
+# | 1.1     | 11/10/2026 | Z. BEN-AKKA | Toolchain and recipes for build, flash, DFU. |
 # ****************************
 # */
 
+####################################################################
+# Toolchain
+####################################################################
+
+CROSS   := arm-none-eabi-
+CC      := $(CROSS)gcc
+OBJCOPY := $(CROSS)objcopy
+SIZE    := $(CROSS)size
+OBJDUMP := $(CROSS)objdump
+
 # Cortex-M7. -mfloat-abi=soft is explicit on purpose: the M7 has an FPU, but
 # the coprocessor is never enabled, so any VFP instruction would fault.
-CROSS      := arm-none-eabi-
 BOARD_ARCH := -mcpu=cortex-m7 -mthumb -mfloat-abi=soft
 
-# mcu.h and board.h, then the board sources linked into every image
-BOARD_CFLAGS := -I$(BOARD_DIR)
-BOARD_SRCS   := $(BOARD_DIR)/startup.c $(BOARD_DIR)/board.c
+# Freestanding code, no C library; one section per function so that the
+# link drops what is unused. -I: mcu.h and board.h come from this folder.
+BOARD_CFLAGS  := $(BOARD_ARCH) -ffunction-sections -fdata-sections
+BOARD_CFLAGS  += -nostdlib -ffreestanding -I$(BOARD_DIR)
+BOARD_LDFLAGS := $(BOARD_ARCH) -nostdlib -Wl,--gc-sections
+
+# Linked into every image
+BOARD_SRCS := $(BOARD_DIR)/startup.c $(BOARD_DIR)/board.c
+
+####################################################################
+# Memories
+####################################################################
 
 # Memories an image can be linked into
 BOARD_MEMORIES       := flash qspi
@@ -51,3 +74,31 @@ MEMORY_qspi_OPENOCD  := -f board/stm32f746g-disco.cfg
 MEMORY_qspi_DFU      :=
 
 BOARD_OPENOCD := $(MEMORY_flash_OPENOCD)
+
+####################################################################
+# Recipes, called with $(call board_xxx,arguments)
+####################################################################
+
+# Compile one C file. $(1): object, $(2): source, $(3): extra flags
+board_compile = $(CC) $(BOARD_CFLAGS) $(PROJECT_CFLAGS) $(3) -c $(2) -o $(1)
+
+# Link objects for a memory. $(1): ELF, $(2): objects, $(3): memory, $(4): map file
+board_link = $(CC) $(2) $(BOARD_LDFLAGS) -T $(MEMORY_$(3)_LDSCRIPT) -Wl,-Map=$(4) -o $(1)
+
+# Raw binary from an ELF. $(1): binary, $(2): ELF
+board_bin = $(OBJCOPY) -O binary $(2) $(1)
+
+# Program a binary into a memory with the ST-LINK. $(1): binary, $(2): memory
+board_flash = sudo openocd $(MEMORY_$(2)_OPENOCD) -c "program $(1) $(MEMORY_$(2)_ADDR) verify reset exit"
+
+# Program a binary over USB, through the ST ROM bootloader (DFU memories only).
+# $(1): binary, $(2): memory
+board_dfu = python3 $(TOOLS)/dfu.py --address $(MEMORY_$(2)_ADDR) $(1)
+
+# Reset the board without reprogramming it
+board_reset = sudo openocd $(BOARD_OPENOCD) -c "init; reset; exit"
+
+# Inspect an ELF. $(1): ELF
+board_size     = $(SIZE) $(1)
+board_disasm   = $(OBJDUMP) -d $(1)
+board_sections = $(OBJDUMP) -h $(1)

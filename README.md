@@ -6,8 +6,9 @@ for register-level, bare-metal C firmware: no HAL, no CMSIS.
 This repository is the board side of
 [stm32f7508-dk-baremetal](https://github.com/zkariae/stm32f7508-dk-baremetal),
 where it lives as a Git submodule at `stm32f7508-dk/`. It describes the
-hardware only: the applications, the generic drivers and the build rules
-are in the main repository (`../dev`, `../Makefile`).
+hardware and how to build for it and program it; what to build (the
+applications, the generic drivers) is in the main repository (`../dev`,
+`../Makefile`).
 
 ## Contents
 
@@ -17,7 +18,7 @@ are in the main repository (`../dev`, `../Makefile`).
 | `board.h/.c`    | Pins, RK043FN48H LCD panel, N25Q128A QSPI flash, and the descriptors passed to the drivers (`BOARD_LED_LD1`, `BOARD_UART_VCP`, `BOARD_LCD_TIMING`...) |
 | `startup.c`     | Vector table, reset handler, entry into the ROM DFU when USER is held |
 | `linker/`       | Memory layouts: internal flash, and execute-in-place from QSPI       |
-| `board.mk`      | CPU flags, board sources and memories (`flash`, `qspi`: linker script, address, OpenOCD config, DFU), included by the root Makefile |
+| `board.mk`      | Toolchain, board sources, memories (`flash`, `qspi`) and the recipes the root Makefile calls: `board_compile`, `board_link`, `board_flash`, `board_dfu`, `board_reset`... |
 | `.clang-format` | Code style; keep identical to `dev/.clang-format`                    |
 
 ## Contract with dev/
