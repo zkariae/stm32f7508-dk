@@ -5,9 +5,9 @@ for register-level, bare-metal C firmware: no HAL, no CMSIS.
 
 This repository is the board side of
 [stm32f7508-dk-baremetal](https://github.com/zkariae/stm32f7508-dk-baremetal),
-where it lives as a Git submodule at `stm32f7508-dk/`. It does not build on
-its own: the Makefile and the headers expect the applications and the
-generic drivers in `../dev`.
+where it lives as a Git submodule at `stm32f7508-dk/`. It describes the
+hardware only: the applications, the generic drivers and the build rules
+are in the main repository (`../dev`, `../Makefile`).
 
 ## Contents
 
@@ -17,14 +17,15 @@ generic drivers in `../dev`.
 | `board.h/.c`    | Pins, RK043FN48H LCD panel, N25Q128A QSPI flash, and the descriptors passed to the drivers (`BOARD_LED_LD1`, `BOARD_UART_VCP`, `BOARD_LCD_TIMING`...) |
 | `startup.c`     | Vector table, reset handler, entry into the ROM DFU when USER is held |
 | `linker/`       | Memory layouts: internal flash, and execute-in-place from QSPI       |
-| `Makefile`      | Builds and flashes the applications of `dev/` for this board         |
+| `board.mk`      | CPU flags, board sources and memories (`flash`, `qspi`: linker script, address, OpenOCD config, DFU), included by the root Makefile |
 | `.clang-format` | Code style; keep identical to `dev/.clang-format`                    |
 
 ## Contract with dev/
 
-Every board provides `mcu.h` (registers, included by the drivers) and
-`board.h` (wiring, included by the applications). A new board is a new
-repository with the same two headers.
+Every board provides `mcu.h` (registers, included by the drivers),
+`board.h` (wiring, included by the applications) and `board.mk` (build
+description, included by the root Makefile). A new board is a new
+repository with the same three files.
 
 ## Usage
 
