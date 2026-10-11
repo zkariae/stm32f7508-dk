@@ -5,7 +5,7 @@
 # \brief      Build and flash the applications of dev/ for the STM32F7508-DK.
 #
 # \author     Z. BEN-AKKA
-# \version    1.2
+# \version    1.3
 # \date       11/10/2026
 #
 # \details
@@ -25,14 +25,15 @@
 # | 1.0     | 29/08/2026 | Z. BEN-AKKA | Initial version.                                              |
 # | 1.1     | 10/10/2026 | Z. BEN-AKKA | Single Makefile, build.mk merged; header per Contributing.md. |
 # | 1.2     | 11/10/2026 | Z. BEN-AKKA | Board folder: builds the applications of dev/.                |
+# | 1.3     | 11/10/2026 | Z. BEN-AKKA | Board folder at the repository root (../dev).                 |
 # ****************************
 # */
 
 BOARD := stm32f7508-dk
-DEV   := ../../dev
+DEV   := ../dev
 APPS_DIR := $(DEV)/apps
 TOOLS := $(DEV)/tools
-BUILD := ../../work/build/$(BOARD)
+BUILD := ../work/build/$(BOARD)
 
 .DEFAULT_GOAL := help
 

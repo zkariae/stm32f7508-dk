@@ -5,7 +5,7 @@
 \brief      Reset handler, vector table and default exception handlers.
 
 \author     Z. BEN-AKKA
-\version    1.3
+\version    1.4
 \date       11/10/2026
 
 \details
@@ -22,6 +22,7 @@
 | 1.1     | 25/09/2026 | Z. BEN-AKKA | Enter the ROM bootloader when USER is held.  |
 | 1.2     | 10/10/2026 | Z. BEN-AKKA | Use defines.h; comments per Contributing.md. |
 | 1.3     | 11/10/2026 | Z. BEN-AKKA | Moved to boards/stm32f7508-dk; uses board.h. |
+| 1.4     | 11/10/2026 | Z. BEN-AKKA | Board folder at the repository root.         |
 ****************************
 */
 

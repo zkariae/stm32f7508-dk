@@ -5,9 +5,9 @@ for register-level, bare-metal C firmware: no HAL, no CMSIS.
 
 This repository is the board side of
 [stm32f7508-dk-baremetal](https://github.com/zkariae/stm32f7508-dk-baremetal),
-where it lives as a Git submodule at `boards/stm32f7508-dk`. It does not build
-on its own: the Makefile and the headers expect the applications and the
-generic drivers in `../../dev`.
+where it lives as a Git submodule at `stm32f7508-dk/`. It does not build on
+its own: the Makefile and the headers expect the applications and the
+generic drivers in `../dev`.
 
 ## Contents
 
