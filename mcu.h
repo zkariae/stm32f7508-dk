@@ -5,8 +5,8 @@
 \brief      STM32F750N8 registers, bit fields and memory map.
 
 \author     Z. BEN-AKKA
-\version    1.0
-\date       11/10/2026
+\version    1.1
+\date       16/10/2026
 
 \details
   Every board provides mcu.h; the drivers of dev/common include it. Addresses
@@ -16,9 +16,10 @@
   - Multi-bit fields take their value: QSPI_CR_PRESCALER(1).
 
 \section mcu_h_version_history Version history
-| Version | Date       | Author      | Description                      |
-|:-------:|:----------:|:------------|:---------------------------------|
-| 1.0     | 11/10/2026 | Z. BEN-AKKA | Split from defines.h: chip part. |
+| Version | Date       | Author      | Description                                 |
+|:-------:|:----------:|:------------|:--------------------------------------------|
+| 1.0     | 11/10/2026 | Z. BEN-AKKA | Split from defines.h: chip part.            |
+| 1.1     | 16/10/2026 | Z. BEN-AKKA | Add USART RX and NVIC register definitions. |
 ****************************
 */
 
@@ -146,17 +147,40 @@
 
 /// USART registers, from the instance base address (USARTx_BASE).
 #define USART_CR1(b) REG((b) + 0x00)
+#define USART_CR2(b) REG((b) + 0x04)
+#define USART_CR3(b) REG((b) + 0x08)
 #define USART_BRR(b) REG((b) + 0x0C)
 #define USART_ISR(b) REG((b) + 0x1C)
+#define USART_ICR(b) REG((b) + 0x20)
 #define USART_RDR(b) REG((b) + 0x24)
 #define USART_TDR(b) REG((b) + 0x28)
 
-#define USART_CR1_UE   (1U << 0)
-#define USART_CR1_RE   (1U << 2)
-#define USART_CR1_TE   (1U << 3)
-#define USART_ISR_RXNE (1U << 5)
-#define USART_ISR_TC   (1U << 6)
-#define USART_ISR_TXE  (1U << 7)
+#define USART_CR1_UE      (1U << 0)
+#define USART_CR1_RE      (1U << 2)
+#define USART_CR1_TE      (1U << 3)
+#define USART_CR1_RXNEIE  (1U << 5)
+
+#define USART_CR3_EIE     (1U << 0)
+
+#define USART_ISR_FE      (1U << 1)
+#define USART_ISR_NE      (1U << 2)
+#define USART_ISR_ORE     (1U << 3)
+#define USART_ISR_RXNE    (1U << 5)
+#define USART_ISR_TC      (1U << 6)
+#define USART_ISR_TXE     (1U << 7)
+
+#define USART_ICR_FECF    (1U << 1)
+#define USART_ICR_NCF     (1U << 2)
+#define USART_ICR_ORECF   (1U << 3)
+
+/* NVIC - Cortex-M7 system control space. */
+#define NVIC_ISER_BASE 0xE000E100UL
+#define NVIC_IPR_BASE  0xE000E400UL
+#define NVIC_ISER(n)   REG(NVIC_ISER_BASE + (((n) / 32U) * 4UL))
+#define NVIC_IPR(n)    (*(volatile uint8_t *)(NVIC_IPR_BASE + (n)))
+
+/* STM32F750 external interrupt number for the USART1 global interrupt. */
+#define USART1_IRQn 37U
 
 /* QUADSPI - RM0385 section 13 */
 #define QSPI_BASE  0xA0001000UL
