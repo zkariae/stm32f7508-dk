@@ -5,8 +5,8 @@
 \brief      STM32F7508-DK wiring: pins, panel, QSPI flash, board descriptors.
 
 \author     Z. BEN-AKKA
-\version    1.0
-\date       11/10/2026
+\version    1.1
+\date       16/10/2026
 
 \details
   API documented in board.h.
@@ -15,6 +15,7 @@
 | Version | Date       | Author      | Description                                   |
 |:-------:|:----------:|:------------|:----------------------------------------------|
 | 1.0     | 11/10/2026 | Z. BEN-AKKA | Board wiring and descriptors, from defines.h. |
+| 1.1     | 16/10/2026 | Z. BEN-AKKA | Add USART1 RX pin to the VCP descriptor.       |
 ****************************
 */
 
@@ -38,6 +39,9 @@ const Uart BOARD_UART_VCP = {
     .tx_port = GPIOA_BASE,
     .tx_pin = VCP_TX_PIN,
     .tx_af = 7, // AF7 = USART1_TX (datasheet, alternate function mapping)
+    .rx_port = GPIOA_BASE,
+    .rx_pin = 10, // PA10, USART1_RX.
+    .rx_af = 7, // AF7 = USART1_RX.
 };
 
 const LtdcTiming BOARD_LCD_TIMING = {
