@@ -5,8 +5,8 @@
 \brief      STM32F750N8 registers, bit fields and memory map.
 
 \author     Z. BEN-AKKA
-\version    1.1
-\date       16/10/2026
+\version    1.2
+\date       19/10/2026
 
 \details
   Every board provides mcu.h; the drivers of dev/common include it. Addresses
@@ -20,6 +20,7 @@
 |:-------:|:----------:|:------------|:--------------------------------------------|
 | 1.0     | 11/10/2026 | Z. BEN-AKKA | Split from defines.h: chip part.            |
 | 1.1     | 16/10/2026 | Z. BEN-AKKA | Add USART RX and NVIC register definitions. |
+| 1.2     | 19/10/2026 | Z. BEN-AKKA | Add DWT cycle counter and DEMCR registers.  |
 ****************************
 */
 
@@ -271,5 +272,15 @@
 #define SCB_AIRCR_SYSRESETREQ (1U << 2)
 #define SCB_CCR_DC            (1U << 16)
 #define SCB_CCR_IC            (1U << 17)
+
+/* Debug: DEMCR enables the DWT, whose cycle counter counts core clocks. */
+#define DEMCR      REG(0xE000EDFCUL)
+#define DWT_CTRL   REG(0xE0001000UL)
+#define DWT_CYCCNT REG(0xE0001004UL)
+#define DWT_LAR    REG(0xE0001FB0UL) ///< Cortex-M7 lock access register.
+
+#define DEMCR_TRCENA       (1U << 24) ///< Enables the DWT and ITM.
+#define DWT_CTRL_CYCCNTENA (1U << 0)
+#define DWT_LAR_UNLOCK     0xC5ACCE55UL ///< Unlocks DWT register writes.
 
 #endif
