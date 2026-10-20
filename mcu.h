@@ -5,8 +5,8 @@
 \brief      STM32F750N8 registers, bit fields and memory map.
 
 \author     Z. BEN-AKKA
-\version    1.2
-\date       19/10/2026
+\version    1.3
+\date       20/10/2026
 
 \details
   Every board provides mcu.h; the drivers of dev/common include it. Addresses
@@ -21,6 +21,7 @@
 | 1.0     | 11/10/2026 | Z. BEN-AKKA | Split from defines.h: chip part.            |
 | 1.1     | 16/10/2026 | Z. BEN-AKKA | Add USART RX and NVIC register definitions. |
 | 1.2     | 19/10/2026 | Z. BEN-AKKA | Add DWT cycle counter and DEMCR registers.  |
+| 1.3     | 20/10/2026 | Z. BEN-AKKA | Add IrqDisable/IrqEnable PRIMASK helpers.   |
 ****************************
 */
 
@@ -282,5 +283,10 @@
 #define DEMCR_TRCENA       (1U << 24) ///< Enables the DWT and ITM.
 #define DWT_CTRL_CYCCNTENA (1U << 0)
 #define DWT_LAR_UNLOCK     0xC5ACCE55UL ///< Unlocks DWT register writes.
+
+/// Mask all configurable interrupts (PRIMASK = 1).
+static inline void IrqDisable(void) { __asm volatile("cpsid i" ::: "memory"); }
+/// Unmask interrupts (PRIMASK = 0).
+static inline void IrqEnable(void) { __asm volatile("cpsie i" ::: "memory"); }
 
 #endif
