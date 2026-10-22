@@ -5,8 +5,8 @@
 \brief      STM32F750N8 registers, bit fields and memory map.
 
 \author     Z. BEN-AKKA
-\version    1.3
-\date       20/10/2026
+\version    1.4
+\date       22/10/2026
 
 \details
   Every board provides mcu.h; the drivers of dev/common include it. Addresses
@@ -22,6 +22,7 @@
 | 1.1     | 16/10/2026 | Z. BEN-AKKA | Add USART RX and NVIC register definitions. |
 | 1.2     | 19/10/2026 | Z. BEN-AKKA | Add DWT cycle counter and DEMCR registers.  |
 | 1.3     | 20/10/2026 | Z. BEN-AKKA | Add IrqDisable/IrqEnable PRIMASK helpers.   |
+| 1.4     | 22/10/2026 | Z. BEN-AKKA | Add RCC_CSR reset flags and RMVF.           |
 ****************************
 */
 
@@ -50,6 +51,7 @@
 #define RCC_AHB3ENR    REG(RCC_BASE + 0x38)
 #define RCC_APB1ENR    REG(RCC_BASE + 0x40)
 #define RCC_APB2ENR    REG(RCC_BASE + 0x44)
+#define RCC_CSR        REG(RCC_BASE + 0x74)
 #define RCC_PLLSAICFGR REG(RCC_BASE + 0x88)
 #define RCC_DCKCFGR1   REG(RCC_BASE + 0x8C)
 
@@ -79,6 +81,17 @@
 #define RCC_APB1ENR_PWREN    (1U << 28)
 #define RCC_APB2ENR_USART1EN (1U << 4)
 #define RCC_APB2ENR_LTDCEN   (1U << 26)
+
+/// Reset flags: set by hardware, kept across resets until RMVF clears them.
+#define RCC_CSR_RMVF       (1U << 24)
+#define RCC_CSR_BORRSTF    (1U << 25)
+#define RCC_CSR_PINRSTF    (1U << 26)
+#define RCC_CSR_PORRSTF    (1U << 27)
+#define RCC_CSR_SFTRSTF    (1U << 28)
+#define RCC_CSR_IWDGRSTF   (1U << 29)
+#define RCC_CSR_WWDGRSTF   (1U << 30)
+#define RCC_CSR_LPWRRSTF   (1U << 31)
+#define RCC_CSR_RSTF_MASK  0xFE000000U ///< All reset flags, bits 31:25.
 
 /* PWR - RM0385 section 4 */
 #define PWR_BASE 0x40007000UL
