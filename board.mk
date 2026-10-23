@@ -5,8 +5,8 @@
 # \brief      STM32F7508-DK build: toolchain, board files, memories and recipes.
 #
 # \author     Z. BEN-AKKA
-# \version    1.1
-# \date       11/10/2026
+# \version    1.2
+# \date       23/10/2026
 #
 # \details
 #   Included by the Makefile of the repository root, which declares the
@@ -26,6 +26,7 @@
 # |:-------:|:----------:|:------------|:---------------------------------------------|
 # | 1.0     | 11/10/2026 | Z. BEN-AKKA | Board part of the former board Makefile.     |
 # | 1.1     | 11/10/2026 | Z. BEN-AKKA | Toolchain and recipes for build, flash, DFU. |
+# | 1.2     | 23/10/2026 | Z. BEN-AKKA | Run OpenOCD without sudo (udev rule, plugdev). |
 # ****************************
 # */
 
@@ -88,15 +89,19 @@ board_link = $(CC) $(2) $(BOARD_LDFLAGS) -T $(MEMORY_$(3)_LDSCRIPT) -Wl,-Map=$(4
 # Raw binary from an ELF. $(1): binary, $(2): ELF
 board_bin = $(OBJCOPY) -O binary $(2) $(1)
 
+# OpenOCD runs as the user: the udev rule shipped with OpenOCD
+# (60-openocd.rules) gives the ST-LINK to the plugdev group, so the user must
+# be in plugdev. No sudo, so automated test runs need no password.
+
 # Program a binary into a memory with the ST-LINK. $(1): binary, $(2): memory
-board_flash = sudo openocd $(MEMORY_$(2)_OPENOCD) -c "program $(1) $(MEMORY_$(2)_ADDR) verify reset exit"
+board_flash = openocd $(MEMORY_$(2)_OPENOCD) -c "program $(1) $(MEMORY_$(2)_ADDR) verify reset exit"
 
 # Program a binary over USB, through the ST ROM bootloader (DFU memories only).
 # $(1): binary, $(2): memory
 board_dfu = python3 $(TOOLS)/dfu.py --address $(MEMORY_$(2)_ADDR) $(1)
 
 # Reset the board without reprogramming it
-board_reset = sudo openocd $(BOARD_OPENOCD) -c "init; reset; exit"
+board_reset = openocd $(BOARD_OPENOCD) -c "init; reset; exit"
 
 # Inspect an ELF. $(1): ELF
 board_size     = $(SIZE) $(1)
