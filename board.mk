@@ -5,8 +5,8 @@
 # \brief      STM32F7508-DK build: toolchain, board files, memories and recipes.
 #
 # \author     Z. BEN-AKKA
-# \version    1.2
-# \date       23/10/2026
+# \version    1.3
+# \date       26/10/2026
 #
 # \details
 #   Included by the Makefile of the repository root, which declares the
@@ -18,7 +18,8 @@
 #     BOARD_MEMORIES, BOARD_DEFAULT_MEMORY        where an image can live
 #     MEMORY_<m>_LDSCRIPT, _ADDR, _DFU            how it is linked and reached
 #     board_compile, board_link, board_bin        build recipes, used with $(call)
-#     board_flash, board_dfu, board_reset         programming recipes
+#     board_flash, board_dfu, board_reset,        programming recipes
+#     board_reset_sw
 #     board_size, board_disasm, board_sections    inspection recipes
 #
 # \section board_mk_version_history Version history
@@ -27,6 +28,7 @@
 # | 1.0     | 11/10/2026 | Z. BEN-AKKA | Board part of the former board Makefile.     |
 # | 1.1     | 11/10/2026 | Z. BEN-AKKA | Toolchain and recipes for build, flash, DFU. |
 # | 1.2     | 23/10/2026 | Z. BEN-AKKA | Run OpenOCD without sudo (udev rule, plugdev). |
+# | 1.3     | 26/10/2026 | Z. BEN-AKKA | Add the software reset recipe (SYSRESETREQ).  |
 # ****************************
 # */
 
@@ -102,6 +104,10 @@ board_dfu = python3 $(TOOLS)/dfu.py --address $(MEMORY_$(2)_ADDR) $(1)
 
 # Reset the board without reprogramming it
 board_reset = openocd $(BOARD_OPENOCD) -c "init; reset; exit"
+
+# Software reset: write SYSRESETREQ to the Cortex-M7 AIRCR (VECTKEY 0x05FA).
+# The core also pulls NRST, so RCC_CSR reports SFTRSTF and PINRSTF.
+board_reset_sw = openocd $(BOARD_OPENOCD) -c "init; mww 0xE000ED0C 0x05FA0004; exit"
 
 # Inspect an ELF. $(1): ELF
 board_size     = $(SIZE) $(1)
