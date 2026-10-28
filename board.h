@@ -5,8 +5,8 @@
 \brief      STM32F7508-DK wiring: pins, panel, QSPI flash, board descriptors.
 
 \author     Z. BEN-AKKA
-\version    1.0
-\date       11/10/2026
+\version    1.1
+\date       28/10/2026
 
 \details
   Every board provides board.h; the applications include it. It describes
@@ -17,6 +17,7 @@
 | Version | Date       | Author      | Description                                   |
 |:-------:|:----------:|:------------|:----------------------------------------------|
 | 1.0     | 11/10/2026 | Z. BEN-AKKA | Board wiring and descriptors, from defines.h. |
+| 1.1     | 28/10/2026 | Z. BEN-AKKA | PG12 on AF9 in the LCD pins documentation.    |
 ****************************
 */
 
@@ -62,7 +63,7 @@ extern const Uart BOARD_UART_VCP;         ///< USART1 TX on PA9, to the ST-LINK 
 extern const LtdcTiming BOARD_LCD_TIMING; ///< RK043FN48H panel, 480x272.
 
 /*!
-\brief  Clock the ports and set the 28 LTDC signals of the panel to AF14.
+\brief  Clock the ports and set the 28 LTDC signals of the panel to AF14 (PG12: AF9).
 */
 void BoardLcdPinsInit(void);
 
