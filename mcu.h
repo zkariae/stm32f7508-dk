@@ -5,8 +5,8 @@
 \brief      STM32F750N8 registers, bit fields and memory map.
 
 \author     Z. BEN-AKKA
-\version    1.4
-\date       22/10/2026
+\version    1.5
+\date       28/10/2026
 
 \details
   Every board provides mcu.h; the drivers of dev/common include it. Addresses
@@ -23,6 +23,7 @@
 | 1.2     | 19/10/2026 | Z. BEN-AKKA | Add DWT cycle counter and DEMCR registers.  |
 | 1.3     | 20/10/2026 | Z. BEN-AKKA | Add IrqDisable/IrqEnable PRIMASK helpers.   |
 | 1.4     | 22/10/2026 | Z. BEN-AKKA | Add RCC_CSR reset flags and RMVF.           |
+| 1.5     | 28/10/2026 | Z. BEN-AKKA | Add QSPI_CR_SSHIFT sample shift.            |
 ****************************
 */
 
@@ -216,6 +217,7 @@
 
 #define QSPI_CR_EN           (1U << 0)
 #define QSPI_CR_ABORT        (1U << 1)
+#define QSPI_CR_SSHIFT       (1U << 4)             ///< Sample data half a clock cycle later.
 #define QSPI_CR_PRESCALER(n) ((uint32_t)(n) << 24) ///< Clock = HCLK / (n + 1).
 #define QSPI_DCR_CSHT(n)     ((uint32_t)(n) << 8)  ///< CS high for at least n + 1 cycles.
 #define QSPI_DCR_FSIZE(n)    ((uint32_t)(n) << 16) ///< Flash size = 2^(n + 1) bytes.
