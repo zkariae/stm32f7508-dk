@@ -5,8 +5,8 @@
 \brief      STM32F7508-DK wiring: pins, panel, QSPI flash, board descriptors.
 
 \author     Z. BEN-AKKA
-\version    1.2
-\date       16/10/2026
+\version    1.3
+\date       28/10/2026
 
 \details
   API documented in board.h.
@@ -17,6 +17,7 @@
 | 1.0     | 11/10/2026 | Z. BEN-AKKA | Board wiring and descriptors, from defines.h. |
 | 1.1     | 16/10/2026 | Z. BEN-AKKA | Add USART1 RX pin to the VCP descriptor.      |
 | 1.2     | 16/10/2026 | Z. BEN-AKKA | Map VCP RX to USART1_RX on PB7.               |
+| 1.3     | 28/10/2026 | Z. BEN-AKKA | PG12 (LTDC_B4) on AF9, not AF14.              |
 ****************************
 */
 
@@ -56,42 +57,42 @@ const LtdcTiming BOARD_LCD_TIMING = {
     .vfp = LCD_VFP,
 };
 
-/// LTDC signals of the panel (MB1191 schematic), all on AF14.
+/// LTDC signals of the panel (MB1191 schematic), on AF14 except PG12 (AF9).
 static const struct {
-  uint8_t port, pin;
+  uint8_t port, pin, af;
 } lcd_pins[] = {
     // Red
-    {PORT_I, 15},
-    {PORT_J, 0},
-    {PORT_J, 1},
-    {PORT_J, 2},
-    {PORT_J, 3},
-    {PORT_J, 4},
-    {PORT_J, 5},
-    {PORT_J, 6},
+    {PORT_I, 15, 14},
+    {PORT_J, 0, 14},
+    {PORT_J, 1, 14},
+    {PORT_J, 2, 14},
+    {PORT_J, 3, 14},
+    {PORT_J, 4, 14},
+    {PORT_J, 5, 14},
+    {PORT_J, 6, 14},
     // Green
-    {PORT_J, 7},
-    {PORT_J, 8},
-    {PORT_J, 9},
-    {PORT_J, 10},
-    {PORT_J, 11},
-    {PORT_K, 0},
-    {PORT_K, 1},
-    {PORT_K, 2},
+    {PORT_J, 7, 14},
+    {PORT_J, 8, 14},
+    {PORT_J, 9, 14},
+    {PORT_J, 10, 14},
+    {PORT_J, 11, 14},
+    {PORT_K, 0, 14},
+    {PORT_K, 1, 14},
+    {PORT_K, 2, 14},
     // Blue
-    {PORT_E, 4},
-    {PORT_J, 13},
-    {PORT_J, 14},
-    {PORT_J, 15},
-    {PORT_G, 12},
-    {PORT_K, 4},
-    {PORT_K, 5},
-    {PORT_K, 6},
+    {PORT_E, 4, 14},
+    {PORT_J, 13, 14},
+    {PORT_J, 14, 14},
+    {PORT_J, 15, 14},
+    {PORT_G, 12, 9}, // B4 is AF9 on PG12 (datasheet, alternate function mapping)
+    {PORT_K, 4, 14},
+    {PORT_K, 5, 14},
+    {PORT_K, 6, 14},
     // Control
-    {PORT_I, 10}, // HSYNC
-    {PORT_I, 9},  // VSYNC
-    {PORT_I, 14}, // CLK
-    {PORT_K, 7},  // DE
+    {PORT_I, 10, 14}, // HSYNC
+    {PORT_I, 9, 14},  // VSYNC
+    {PORT_I, 14, 14}, // CLK
+    {PORT_K, 7, 14},  // DE
 };
 
 #define LCD_PIN_COUNT (sizeof(lcd_pins) / sizeof(lcd_pins[0]))
@@ -100,7 +101,7 @@ void BoardLcdPinsInit(void)
 {
   for (uint32_t i = 0; i < LCD_PIN_COUNT; i++) {
     GpioEnableClock(GPIO_PORT(lcd_pins[i].port));
-    GpioSetAf(GPIO_PORT(lcd_pins[i].port), lcd_pins[i].pin, 14U);
+    GpioSetAf(GPIO_PORT(lcd_pins[i].port), lcd_pins[i].pin, lcd_pins[i].af);
   }
 }
 
