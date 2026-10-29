@@ -5,8 +5,8 @@
 \brief      STM32F750N8 registers, bit fields and memory map.
 
 \author     Z. BEN-AKKA
-\version    1.5
-\date       28/10/2026
+\version    1.6
+\date       29/10/2026
 
 \details
   Every board provides mcu.h; the drivers of dev/common include it. Addresses
@@ -24,6 +24,7 @@
 | 1.3     | 20/10/2026 | Z. BEN-AKKA | Add IrqDisable/IrqEnable PRIMASK helpers.   |
 | 1.4     | 22/10/2026 | Z. BEN-AKKA | Add RCC_CSR reset flags and RMVF.           |
 | 1.5     | 28/10/2026 | Z. BEN-AKKA | Add QSPI_CR_SSHIFT sample shift.            |
+| 1.6     | 29/10/2026 | Z. BEN-AKKA | Formatted with clang-format.                |
 ****************************
 */
 
@@ -84,15 +85,15 @@
 #define RCC_APB2ENR_LTDCEN   (1U << 26)
 
 /// Reset flags: set by hardware, kept across resets until RMVF clears them.
-#define RCC_CSR_RMVF       (1U << 24)
-#define RCC_CSR_BORRSTF    (1U << 25)
-#define RCC_CSR_PINRSTF    (1U << 26)
-#define RCC_CSR_PORRSTF    (1U << 27)
-#define RCC_CSR_SFTRSTF    (1U << 28)
-#define RCC_CSR_IWDGRSTF   (1U << 29)
-#define RCC_CSR_WWDGRSTF   (1U << 30)
-#define RCC_CSR_LPWRRSTF   (1U << 31)
-#define RCC_CSR_RSTF_MASK  0xFE000000U ///< All reset flags, bits 31:25.
+#define RCC_CSR_RMVF      (1U << 24)
+#define RCC_CSR_BORRSTF   (1U << 25)
+#define RCC_CSR_PINRSTF   (1U << 26)
+#define RCC_CSR_PORRSTF   (1U << 27)
+#define RCC_CSR_SFTRSTF   (1U << 28)
+#define RCC_CSR_IWDGRSTF  (1U << 29)
+#define RCC_CSR_WWDGRSTF  (1U << 30)
+#define RCC_CSR_LPWRRSTF  (1U << 31)
+#define RCC_CSR_RSTF_MASK 0xFE000000U ///< All reset flags, bits 31:25.
 
 /* PWR - RM0385 section 4 */
 #define PWR_BASE 0x40007000UL
@@ -128,7 +129,7 @@
 #define GPIOK_BASE 0x40022800UL
 
 /// Port base address from a port index, for tables storing ports as one byte.
-#define GPIO_PORT(n) (GPIOA_BASE + (n) * 0x400UL)
+#define GPIO_PORT(n) (GPIOA_BASE + 0x400UL * (n))
 #define PORT_A       0
 #define PORT_B       1
 #define PORT_C       2
@@ -171,23 +172,23 @@
 #define USART_RDR(b) REG((b) + 0x24)
 #define USART_TDR(b) REG((b) + 0x28)
 
-#define USART_CR1_UE      (1U << 0)
-#define USART_CR1_RE      (1U << 2)
-#define USART_CR1_TE      (1U << 3)
-#define USART_CR1_RXNEIE  (1U << 5)
+#define USART_CR1_UE     (1U << 0)
+#define USART_CR1_RE     (1U << 2)
+#define USART_CR1_TE     (1U << 3)
+#define USART_CR1_RXNEIE (1U << 5)
 
-#define USART_CR3_EIE     (1U << 0)
+#define USART_CR3_EIE (1U << 0)
 
-#define USART_ISR_FE      (1U << 1)
-#define USART_ISR_NE      (1U << 2)
-#define USART_ISR_ORE     (1U << 3)
-#define USART_ISR_RXNE    (1U << 5)
-#define USART_ISR_TC      (1U << 6)
-#define USART_ISR_TXE     (1U << 7)
+#define USART_ISR_FE   (1U << 1)
+#define USART_ISR_NE   (1U << 2)
+#define USART_ISR_ORE  (1U << 3)
+#define USART_ISR_RXNE (1U << 5)
+#define USART_ISR_TC   (1U << 6)
+#define USART_ISR_TXE  (1U << 7)
 
-#define USART_ICR_FECF    (1U << 1)
-#define USART_ICR_NCF     (1U << 2)
-#define USART_ICR_ORECF   (1U << 3)
+#define USART_ICR_FECF  (1U << 1)
+#define USART_ICR_NCF   (1U << 2)
+#define USART_ICR_ORECF (1U << 3)
 
 /* NVIC - Cortex-M7 system control space. */
 #define NVIC_ISER_BASE 0xE000E100UL
@@ -300,8 +301,14 @@
 #define DWT_LAR_UNLOCK     0xC5ACCE55UL ///< Unlocks DWT register writes.
 
 /// Mask all configurable interrupts (PRIMASK = 1).
-static inline void IrqDisable(void) { __asm volatile("cpsid i" ::: "memory"); }
+static inline void IrqDisable(void)
+{
+  __asm volatile("cpsid i" ::: "memory");
+}
 /// Unmask interrupts (PRIMASK = 0).
-static inline void IrqEnable(void) { __asm volatile("cpsie i" ::: "memory"); }
+static inline void IrqEnable(void)
+{
+  __asm volatile("cpsie i" ::: "memory");
+}
 
 #endif
