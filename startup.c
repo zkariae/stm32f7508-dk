@@ -5,8 +5,8 @@
 \brief      Reset handler, vector table and default exception handlers.
 
 \author     Z. BEN-AKKA
-\version    1.5
-\date       16/10/2026
+\version    1.6
+\date       29/10/2026
 
 \details
   Shared by every application. On reset:
@@ -24,6 +24,7 @@
 | 1.3     | 11/10/2026 | Z. BEN-AKKA | Moved to boards/stm32f7508-dk; uses board.h. |
 | 1.4     | 11/10/2026 | Z. BEN-AKKA | Board folder at the repository root.         |
 | 1.5     | 16/10/2026 | Z. BEN-AKKA | Add the USART1 external interrupt vector.    |
+| 1.6     | 29/10/2026 | Z. BEN-AKKA | Vector table kept out of clang-format.       |
 ****************************
 */
 
@@ -114,6 +115,8 @@ void PendSV_Handler(void) __attribute__((weak, alias("Default_Handler")));
 void SysTick_Handler(void) __attribute__((weak, alias("Default_Handler")));
 void USART1_IRQHandler(void) __attribute__((weak, alias("Default_Handler")));
 
+// Not formatted: clang-format would pack several vectors on one line
+// clang-format off
 /// Cortex-M vector table, placed first in flash by the linker script.
 __attribute__((section(".isr_vector"), used)) void (*const vector_table[])(void) = {
     (void (*)(void))&_estack, // 0x00: initial stack pointer
@@ -173,3 +176,4 @@ __attribute__((section(".isr_vector"), used)) void (*const vector_table[])(void)
     Default_Handler, // 36: SPI2
     USART1_IRQHandler, // 37: USART1
 };
+// clang-format on
