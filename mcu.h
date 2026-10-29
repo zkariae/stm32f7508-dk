@@ -5,7 +5,7 @@
 \brief      STM32F750N8 registers, bit fields and memory map.
 
 \author     Z. BEN-AKKA
-\version    1.6
+\version    1.7
 \date       29/10/2026
 
 \details
@@ -25,6 +25,7 @@
 | 1.4     | 22/10/2026 | Z. BEN-AKKA | Add RCC_CSR reset flags and RMVF.           |
 | 1.5     | 28/10/2026 | Z. BEN-AKKA | Add QSPI_CR_SSHIFT sample shift.            |
 | 1.6     | 29/10/2026 | Z. BEN-AKKA | Formatted with clang-format.                |
+| 1.7     | 29/10/2026 | Z. BEN-AKKA | Add LTDC_CPSR, the current scan position.   |
 ****************************
 */
 
@@ -254,6 +255,7 @@
 #define LTDC_BCCR     REG(LTDC_BASE + 0x2C)
 #define LTDC_ISR      REG(LTDC_BASE + 0x38)
 #define LTDC_ICR      REG(LTDC_BASE + 0x3C)
+#define LTDC_CPSR     REG(LTDC_BASE + 0x44)
 #define LTDC_CDSR     REG(LTDC_BASE + 0x48)
 #define LTDC_L1CR     REG(LTDC_BASE + 0x84)
 #define LTDC_L1WHPCR  REG(LTDC_BASE + 0x88)
@@ -270,6 +272,8 @@
 #define LTDC_ISR_FUIF   (1U << 1)
 #define LTDC_L1CR_LEN   (1U << 0)
 #define LTDC_PF_RGB565  2U ///< LTDC_LxPFCR pixel format.
+
+#define LTDC_CPSR_CYPOS_MASK 0xFFFFU ///< LTDC_CPSR: current line, bits 15:0.
 
 /* Cortex-M7 core - ARMv7-M Architecture Reference Manual */
 #define SYST_CSR REG(0xE000E010UL)
