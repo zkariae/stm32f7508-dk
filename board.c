@@ -5,8 +5,8 @@
 \brief      STM32F7508-DK wiring: pins, panel, QSPI flash, board descriptors.
 
 \author     Z. BEN-AKKA
-\version    1.4
-\date       29/10/2026
+\version    1.5
+\date       18/11/2026
 
 \details
   API documented in board.h.
@@ -19,6 +19,7 @@
 | 1.2     | 16/10/2026 | Z. BEN-AKKA | Map VCP RX to USART1_RX on PB7.               |
 | 1.3     | 28/10/2026 | Z. BEN-AKKA | PG12 (LTDC_B4) on AF9, not AF14.              |
 | 1.4     | 29/10/2026 | Z. BEN-AKKA | Formatted with clang-format.                  |
+| 1.5     | 18/11/2026 | Z. BEN-AKKA | Add the I2C3 descriptor of the touch panel.   |
 ****************************
 */
 
@@ -56,6 +57,24 @@ const LtdcTiming BOARD_LCD_TIMING = {
     .vsw = LCD_VSW,
     .vbp = LCD_VBP,
     .vfp = LCD_VFP,
+};
+
+const I2c BOARD_I2C_TOUCH = {
+    .base = I2C3_BASE,
+    .enr = &RCC_APB1ENR,
+    .enr_bit = RCC_APB1ENR_I2C3EN,
+    .rstr = &RCC_APB1RSTR,
+    .rst_bit = RCC_APB1RSTR_I2C3RST,
+    .sel_mask = RCC_DCKCFGR2_I2C3SEL_MASK,
+    .sel_value = RCC_DCKCFGR2_I2C3SEL_HSI,
+    .kernel_hsi = 1,
+    // 100 kHz from HSI 16 MHz: PRESC 3, SCLDEL 4, SDADEL 2, SCLH 0x0F, SCLL 0x13 (RM0385 Table 187)
+    .timingr = 0x30420F13U,
+    .scl_port = GPIOH_BASE,
+    .scl_pin = TOUCH_SCL_PIN,
+    .sda_port = GPIOH_BASE,
+    .sda_pin = TOUCH_SDA_PIN,
+    .af = 4, // AF4 = I2C3 (DS12535 Table 12)
 };
 
 /// LTDC signals of the panel (MB1191 schematic), on AF14 except PG12 (AF9).
