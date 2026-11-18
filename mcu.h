@@ -5,8 +5,8 @@
 \brief      STM32F750N8 registers, bit fields and memory map.
 
 \author     Z. BEN-AKKA
-\version    1.7
-\date       29/10/2026
+\version    1.8
+\date       18/11/2026
 
 \details
   Every board provides mcu.h; the drivers of dev/common include it. Addresses
@@ -26,6 +26,7 @@
 | 1.5     | 28/10/2026 | Z. BEN-AKKA | Add QSPI_CR_SSHIFT sample shift.            |
 | 1.6     | 29/10/2026 | Z. BEN-AKKA | Formatted with clang-format.                |
 | 1.7     | 29/10/2026 | Z. BEN-AKKA | Add LTDC_CPSR, the current scan position.   |
+| 1.8     | 18/11/2026 | Z. BEN-AKKA | Add the I2C3 and HSI registers.             |
 ****************************
 */
 
@@ -51,13 +52,17 @@
 #define RCC_PLLCFGR    REG(RCC_BASE + 0x04)
 #define RCC_CFGR       REG(RCC_BASE + 0x08)
 #define RCC_AHB1ENR    REG(RCC_BASE + 0x30)
+#define RCC_APB1RSTR   REG(RCC_BASE + 0x20)
 #define RCC_AHB3ENR    REG(RCC_BASE + 0x38)
 #define RCC_APB1ENR    REG(RCC_BASE + 0x40)
 #define RCC_APB2ENR    REG(RCC_BASE + 0x44)
 #define RCC_CSR        REG(RCC_BASE + 0x74)
 #define RCC_PLLSAICFGR REG(RCC_BASE + 0x88)
 #define RCC_DCKCFGR1   REG(RCC_BASE + 0x8C)
+#define RCC_DCKCFGR2   REG(RCC_BASE + 0x90)
 
+#define RCC_CR_HSION     (1U << 0) ///< Set at reset.
+#define RCC_CR_HSIRDY    (1U << 1)
 #define RCC_CR_HSEON     (1U << 16)
 #define RCC_CR_HSERDY    (1U << 17)
 #define RCC_CR_PLLON     (1U << 24)
@@ -81,9 +86,15 @@
 #define RCC_AHB1ENR_GPIOJEN  (1U << 9)
 #define RCC_AHB1ENR_GPIOKEN  (1U << 10)
 #define RCC_AHB3ENR_QSPIEN   (1U << 1)
+#define RCC_APB1RSTR_I2C3RST (1U << 23)
+#define RCC_APB1ENR_I2C3EN   (1U << 23)
 #define RCC_APB1ENR_PWREN    (1U << 28)
 #define RCC_APB2ENR_USART1EN (1U << 4)
 #define RCC_APB2ENR_LTDCEN   (1U << 26)
+
+/// I2C3 kernel clock source, DCKCFGR2 bits 21:20.
+#define RCC_DCKCFGR2_I2C3SEL_MASK (3U << 20)
+#define RCC_DCKCFGR2_I2C3SEL_HSI  (2U << 20) ///< 10 = HSI 16 MHz.
 
 /// Reset flags: set by hardware, kept across resets until RMVF clears them.
 #define RCC_CSR_RMVF      (1U << 24)
@@ -190,6 +201,40 @@
 #define USART_ICR_FECF  (1U << 1)
 #define USART_ICR_NCF   (1U << 2)
 #define USART_ICR_ORECF (1U << 3)
+
+/* I2C - RM0385 section 30, register map in Table 196. */
+#define I2C3_BASE 0x40005C00UL
+
+/// I2C registers, from the instance base address (I2Cx_BASE).
+#define I2C_CR1(b)     REG((b) + 0x00)
+#define I2C_CR2(b)     REG((b) + 0x04)
+#define I2C_TIMINGR(b) REG((b) + 0x10)
+#define I2C_ISR(b)     REG((b) + 0x18)
+#define I2C_ICR(b)     REG((b) + 0x1C)
+#define I2C_RXDR(b)    REG((b) + 0x24)
+#define I2C_TXDR(b)    REG((b) + 0x28)
+
+#define I2C_CR1_PE        (1U << 0)
+#define I2C_CR2_SADD7(a)  ((uint32_t)(a) << 1) ///< 7-bit address in SADD[7:1].
+#define I2C_CR2_RD_WRN    (1U << 10)           ///< 1 = read transfer.
+#define I2C_CR2_START     (1U << 13)
+#define I2C_CR2_STOP      (1U << 14)
+#define I2C_CR2_NBYTES(n) ((uint32_t)(n) << 16) ///< Bytes to transfer, 0-255.
+#define I2C_CR2_AUTOEND   (1U << 25)            ///< STOP sent after NBYTES.
+
+#define I2C_ISR_TXIS  (1U << 1)
+#define I2C_ISR_RXNE  (1U << 2)
+#define I2C_ISR_NACKF (1U << 4)
+#define I2C_ISR_STOPF (1U << 5)
+#define I2C_ISR_TC    (1U << 6)
+#define I2C_ISR_BERR  (1U << 8)
+#define I2C_ISR_ARLO  (1U << 9)
+#define I2C_ISR_BUSY  (1U << 15)
+
+#define I2C_ICR_NACKCF (1U << 4)
+#define I2C_ICR_STOPCF (1U << 5)
+#define I2C_ICR_BERRCF (1U << 8)
+#define I2C_ICR_ARLOCF (1U << 9)
 
 /* NVIC - Cortex-M7 system control space. */
 #define NVIC_ISER_BASE 0xE000E100UL
