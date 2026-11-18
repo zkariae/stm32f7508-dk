@@ -5,8 +5,8 @@
 \brief      STM32F7508-DK wiring: pins, panel, QSPI flash, board descriptors.
 
 \author     Z. BEN-AKKA
-\version    1.1
-\date       28/10/2026
+\version    1.2
+\date       18/11/2026
 
 \details
   Every board provides board.h; the applications include it. It describes
@@ -18,6 +18,7 @@
 |:-------:|:----------:|:------------|:----------------------------------------------|
 | 1.0     | 11/10/2026 | Z. BEN-AKKA | Board wiring and descriptors, from defines.h. |
 | 1.1     | 28/10/2026 | Z. BEN-AKKA | PG12 on AF9 in the LCD pins documentation.    |
+| 1.2     | 18/11/2026 | Z. BEN-AKKA | Touch panel: I2C3, FT5336 address, INT pin.   |
 ****************************
 */
 
@@ -28,6 +29,7 @@
 
 #include "mcu.h"
 
+#include "i2c/i2c.h"
 #include "led/led.h"
 #include "ltdc/ltdc.h"
 #include "uart/uart.h"
@@ -58,9 +60,19 @@
 #define N25Q128A_SIZE_LOG2     24         ///< 2^24 bytes = 16 MB.
 #define N25Q128A_ID            0x18BA20UL ///< Manufacturer 0x20, type 0xBA, 128 Mbit; LSB first.
 
+/* Touch panel - FT5336 on I2C3 (MB1191 p. 14). Its RESET is NRST (MB1191
+ * p. 3): after any MCU reset it answers 200 ms later (FT5336GQQ v0.6,
+ * Table 3-5). I2C3 also carries the WM8994 codec (0x1A); pull-ups R61 (SDA)
+ * and R62 (SCL), 2.7 kOhm. */
+#define TOUCH_SCL_PIN 7    ///< PH7, I2C3_SCL, AF4 (DS12535 Table 12).
+#define TOUCH_SDA_PIN 8    ///< PH8, I2C3_SDA, AF4 (DS12535 Table 12).
+#define TOUCH_INT_PIN 13   ///< PI13, LCD_INT; not used: the panel is polled.
+#define FT5336_ADDR   0x38 ///< 7-bit address (0x70 in 8 bits).
+
 extern const Led BOARD_LED_LD1;           ///< LD1 green, PI1, active high.
 extern const Uart BOARD_UART_VCP;         ///< USART1 TX on PA9, to the ST-LINK virtual COM port.
 extern const LtdcTiming BOARD_LCD_TIMING; ///< RK043FN48H panel, 480x272.
+extern const I2c BOARD_I2C_TOUCH;         ///< I2C3 on PH7/PH8 AF4, HSI kernel clock, 100 kHz.
 
 /*!
 \brief  Clock the ports and set the 28 LTDC signals of the panel to AF14 (PG12: AF9).
